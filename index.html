@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Liquidación Laboral (Colombia)</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: #f5f7fb;
+      color: #17212f;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 25px rgba(23, 33, 47, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.6rem;
+    }
+
+    p {
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.9rem;
+      margin: 1rem 0;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      padding: 0.65rem;
+      border-radius: 8px;
+      border: 1px solid #c9d4e0;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      background: #0053b4;
+      border-color: #0053b4;
+      color: #fff;
+      margin-top: 0.8rem;
+    }
+
+    button:hover {
+      background: #003f88;
+    }
+
+    .results {
+      margin-top: 1.2rem;
+      border-top: 1px solid #e4ebf3;
+      padding-top: 1rem;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.35rem 0;
+      border-bottom: 1px dashed #eef2f7;
+    }
+
+    .result-item.total {
+      margin-top: 0.5rem;
+      border-bottom: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .notice {
+      font-size: 0.88rem;
+      color: #49586b;
+      background: #eef5ff;
+      border: 1px solid #cfe1ff;
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>Calculadora simple de liquidación laboral (Colombia)</h1>
+    <p>
+      Esta herramienta estima las prestaciones sociales al terminar un contrato laboral: cesantías,
+      intereses de cesantías, prima de servicios y vacaciones. Es una guía orientativa.
+    </p>
+
+    <form id="liquidacion-form">
+      <div class="grid">
+        <div>
+          <label for="salario">Salario mensual (COP)</label>
+          <input id="salario" type="number" min="0" step="1000" required value="1300000" />
+        </div>
+
+        <div>
+          <label for="auxilio">Auxilio de transporte mensual (COP)</label>
+          <input id="auxilio" type="number" min="0" step="1000" value="162000" />
+        </div>
+
+        <div>
+          <label for="dias">Días trabajados en el periodo a liquidar</label>
+          <input id="dias" type="number" min="1" max="360" required value="180" />
+        </div>
+
+        <div>
+          <label for="incluyeAux">¿Incluye auxilio para cesantías y prima?</label>
+          <select id="incluyeAux">
+            <option value="si" selected>Sí</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit">Calcular liquidación</button>
+    </form>
+
+    <section class="results" id="resultados" hidden>
+      <div class="result-item"><span>Cesantías</span><strong id="rCesantias">$ 0</strong></div>
+      <div class="result-item"><span>Intereses de cesantías (12% anual)</span><strong id="rIntereses">$ 0</strong></div>
+      <div class="result-item"><span>Prima de servicios</span><strong id="rPrima">$ 0</strong></div>
+      <div class="result-item"><span>Vacaciones</span><strong id="rVacaciones">$ 0</strong></div>
+      <div class="result-item total"><span>Total estimado</span><strong id="rTotal">$ 0</strong></div>
+    </section>
+
+    <div class="notice">
+      Fórmulas aplicadas: <strong>Cesantías = base × días / 360</strong>,
+      <strong>Intereses = cesantías × 0.12 × días / 360</strong>,
+      <strong>Prima = base × días / 360</strong>,
+      <strong>Vacaciones = salario × días / 720</strong>.
+      No incluye indemnizaciones, deducciones, horas extra ni casos especiales.
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById('liquidacion-form');
+    const resultados = document.getElementById('resultados');
+
+    const formatCOP = (value) =>
+      new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        maximumFractionDigits: 0
+      }).format(value);
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const salario = Number(document.getElementById('salario').value) || 0;
+      const auxilio = Number(document.getElementById('auxilio').value) || 0;
+      const dias = Number(document.getElementById('dias').value) || 0;
+      const incluyeAux = document.getElementById('incluyeAux').value === 'si';
+
+      const basePrestaciones = salario + (incluyeAux ? auxilio : 0);
+
+      const cesantias = (basePrestaciones * dias) / 360;
+      const intereses = cesantias * 0.12 * (dias / 360);
+      const prima = (basePrestaciones * dias) / 360;
+      const vacaciones = (salario * dias) / 720;
+      const total = cesantias + intereses + prima + vacaciones;
+
+      document.getElementById('rCesantias').textContent = formatCOP(cesantias);
+      document.getElementById('rIntereses').textContent = formatCOP(intereses);
+      document.getElementById('rPrima').textContent = formatCOP(prima);
+      document.getElementById('rVacaciones').textContent = formatCOP(vacaciones);
+      document.getElementById('rTotal').textContent = formatCOP(total);
+
+      resultados.hidden = false;
+    });
+  </script>
+</body>
+</html>
