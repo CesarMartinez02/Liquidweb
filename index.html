@@ -3,195 +3,449 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calculadora de Liquidación Laboral</title>
+  <title>LiquidPro | Calculadora de Liquidación Laboral</title>
   <style>
     :root {
-      color-scheme: light;
-      font-family: Arial, Helvetica, sans-serif;
+      --bg: #f3f6fb;
+      --card: #ffffff;
+      --text: #17212f;
+      --muted: #5b6b7d;
+      --line: #d7e1ee;
+      --brand: #0a4fb3;
+      --brand-2: #0f6bdc;
+      --accent: #eaf2ff;
+      --ok: #0f8f44;
+      font-family: "Inter", Arial, Helvetica, sans-serif;
     }
+
+    body.dark {
+      --bg: #0f1724;
+      --card: #172235;
+      --text: #e8f0ff;
+      --muted: #9eb0ca;
+      --line: #2a3a52;
+      --brand: #75a8ff;
+      --brand-2: #4f8dff;
+      --accent: #223452;
+      --ok: #6de3a2;
+    }
+
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 2rem;
-      background: #f5f7fb;
-      color: #17212f;
+      background: var(--bg);
+      color: var(--text);
+      padding: 1.2rem;
     }
 
-    .container {
-      max-width: 860px;
+    .app {
+      max-width: 1150px;
       margin: 0 auto;
-      background: #fff;
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 10px 25px rgba(23, 33, 47, 0.08);
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1rem;
     }
 
-    h1 {
-      margin-top: 0;
-      font-size: 1.6rem;
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; }
     }
 
-    p {
-      line-height: 1.5;
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 12px 28px rgba(5, 24, 56, 0.08);
+    }
+
+    .branding {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .logo-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+    }
+
+    .muted { color: var(--muted); }
+
+    h1 { margin: 0; font-size: 1.45rem; }
+    h2 { font-size: 1.04rem; margin: 0.2rem 0 0.6rem; }
+
+    .toolbar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.58rem 0.75rem;
+      font-weight: 650;
+      cursor: pointer;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .btn-primary {
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #fff;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 0.9rem;
-      margin: 1rem 0;
+      gap: 0.85rem;
+      margin-top: 0.6rem;
     }
 
-    label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-    }
+    label { display: block; font-size: 0.88rem; font-weight: 650; margin-bottom: 0.2rem; }
 
-    input,
-    select,
-    button {
+    input, select {
       width: 100%;
-      padding: 0.65rem;
+      border: 1px solid var(--line);
       border-radius: 8px;
-      border: 1px solid #c9d4e0;
-      font-size: 0.95rem;
-      box-sizing: border-box;
+      padding: 0.54rem 0.58rem;
+      background: var(--card);
+      color: var(--text);
     }
 
-    button {
-      cursor: pointer;
-      font-weight: 700;
-      background: #0053b4;
-      border-color: #0053b4;
-      color: #fff;
-      margin-top: 0.8rem;
-    }
-
-    button:hover {
-      background: #003f88;
-    }
-
-    .results {
-      margin-top: 1.2rem;
-      border-top: 1px solid #e4ebf3;
-      padding-top: 1rem;
+    .section {
+      margin-top: 0.95rem;
+      padding-top: 0.75rem;
+      border-top: 1px dashed var(--line);
     }
 
     .result-item {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
+      gap: 1rem;
       padding: 0.35rem 0;
-      border-bottom: 1px dashed #eef2f7;
+      border-bottom: 1px dashed var(--line);
+      font-size: 0.93rem;
     }
 
-    .result-item.total {
-      margin-top: 0.5rem;
+    .result-item strong { color: var(--ok); }
+
+    .total {
+      font-size: 1.04rem;
+      font-weight: 800;
       border-bottom: 0;
-      font-size: 1.1rem;
-      font-weight: 700;
+      margin-top: 0.35rem;
     }
 
-    .notice {
-      font-size: 0.88rem;
-      color: #49586b;
-      background: #eef5ff;
-      border: 1px solid #cfe1ff;
-      border-radius: 8px;
-      padding: 0.75rem;
-      margin-top: 1rem;
+    .pill {
+      background: var(--accent);
+      border: 1px solid var(--line);
+      padding: 0.32rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      display: inline-block;
+      margin-right: 0.35rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .small { font-size: 0.82rem; }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .toolbar, .no-print { display: none !important; }
+      .app { grid-template-columns: 1fr; max-width: 100%; }
+      .card { box-shadow: none; border: 0; }
     }
   </style>
 </head>
 <body>
-  <main class="container">
-    <h1>Calculadora simple de liquidación laboral (Colombia)</h1>
-    <p>
-      Esta herramienta estima las prestaciones sociales al terminar un contrato laboral: cesantías,
-      intereses de cesantías, prima de servicios y vacaciones. Es una guía orientativa.
-    </p>
-
-    <form id="liquidacion-form">
-      <div class="grid">
+  <main class="app">
+    <section class="card">
+      <div class="branding">
         <div>
-          <label for="salario">Salario mensual (COP)</label>
-          <input id="salario" type="number" min="0" step="1000" required value="1300000" />
+          <div class="logo"><span class="logo-badge">LP</span> LiquidPro LegalTech</div>
+          <h1>Calculadora de Liquidación Laboral</h1>
+          <p class="muted small">Diseño orientado a práctica legal laboral. Resultado estimado con base normativa visible.</p>
         </div>
-
-        <div>
-          <label for="auxilio">Auxilio de transporte mensual (COP)</label>
-          <input id="auxilio" type="number" min="0" step="1000" value="162000" />
-        </div>
-
-        <div>
-          <label for="dias">Días trabajados en el periodo a liquidar</label>
-          <input id="dias" type="number" min="1" max="360" required value="180" />
-        </div>
-
-        <div>
-          <label for="incluyeAux">¿Incluye auxilio para cesantías y prima?</label>
-          <select id="incluyeAux">
-            <option value="si" selected>Sí</option>
-            <option value="no">No</option>
-          </select>
+        <div class="toolbar no-print">
+          <button type="button" id="darkModeBtn">🌙 Modo oscuro</button>
+          <button type="button" id="pdfBtn">📄 Exportar a PDF</button>
         </div>
       </div>
 
-      <button type="submit">Calcular liquidación</button>
-    </form>
+      <form id="liquidacionForm">
+        <h2>1) Datos del contrato y salario</h2>
+        <div class="grid">
+          <div>
+            <label for="salarioBase">Salario base mensual (COP)</label>
+            <input id="salarioBase" type="number" min="0" step="1000" value="1800000" required />
+          </div>
+          <div>
+            <label for="tipoSalario">Tipo de salario</label>
+            <select id="tipoSalario">
+              <option value="ordinario" selected>Ordinario</option>
+              <option value="integral">Integral</option>
+              <option value="variable">Variable/promedio</option>
+            </select>
+          </div>
+          <div>
+            <label for="auxilio">Auxilio de transporte mensual (COP)</label>
+            <input id="auxilio" type="number" min="0" step="1000" value="162000" />
+          </div>
+          <div>
+            <label for="smmlv">SMMLV de referencia (COP)</label>
+            <input id="smmlv" type="number" min="1" step="1000" value="1300000" />
+          </div>
+          <div>
+            <label for="fechaInicio">Fecha de inicio</label>
+            <input id="fechaInicio" type="date" required />
+          </div>
+          <div>
+            <label for="fechaFin">Fecha de terminación</label>
+            <input id="fechaFin" type="date" required />
+          </div>
+          <div>
+            <label for="tipoContrato">Tipo de contrato</label>
+            <select id="tipoContrato">
+              <option value="indefinido" selected>Indefinido</option>
+              <option value="fijo">Término fijo</option>
+              <option value="obra">Obra/labor</option>
+            </select>
+          </div>
+          <div>
+            <label for="causaTerminacion">Causa de terminación</label>
+            <select id="causaTerminacion">
+              <option value="mutuo" selected>Mutuo acuerdo / renuncia</option>
+              <option value="justa">Despido con justa causa</option>
+              <option value="sin_justa">Despido sin justa causa</option>
+            </select>
+          </div>
+          <div>
+            <label for="diasPendientesFijo">Días faltantes (si es contrato fijo)</label>
+            <input id="diasPendientesFijo" type="number" min="0" value="0" />
+          </div>
+          <div>
+            <label for="includeAux">¿Incluir auxilio en cesantías y prima?</label>
+            <select id="includeAux">
+              <option value="si" selected>Sí</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+        </div>
 
-    <section class="results" id="resultados" hidden>
-      <div class="result-item"><span>Cesantías</span><strong id="rCesantias">$ 0</strong></div>
-      <div class="result-item"><span>Intereses de cesantías (12% anual)</span><strong id="rIntereses">$ 0</strong></div>
-      <div class="result-item"><span>Prima de servicios</span><strong id="rPrima">$ 0</strong></div>
-      <div class="result-item"><span>Vacaciones</span><strong id="rVacaciones">$ 0</strong></div>
-      <div class="result-item total"><span>Total estimado</span><strong id="rTotal">$ 0</strong></div>
+        <div class="section">
+          <h2>2) Variables complementarias (opcionales)</h2>
+          <div class="grid">
+            <div>
+              <label for="hextraDiurna">Horas extra diurnas pendientes</label>
+              <input id="hextraDiurna" type="number" min="0" step="0.5" value="0" />
+            </div>
+            <div>
+              <label for="hextraNocturna">Horas extra nocturnas pendientes</label>
+              <input id="hextraNocturna" type="number" min="0" step="0.5" value="0" />
+            </div>
+            <div>
+              <label for="hrecargoNocturno">Horas recargo nocturno pendientes</label>
+              <input id="hrecargoNocturno" type="number" min="0" step="0.5" value="0" />
+            </div>
+            <div>
+              <label for="hrecargoFestivo">Horas recargo dominical/festivo pendientes</label>
+              <input id="hrecargoFestivo" type="number" min="0" step="0.5" value="0" />
+            </div>
+            <div>
+              <label for="dotacionAdeudada">Dotación adeudada (COP)</label>
+              <input id="dotacionAdeudada" type="number" min="0" step="1000" value="0" />
+            </div>
+            <div>
+              <label for="diasMora">Días de mora para sanción moratoria</label>
+              <input id="diasMora" type="number" min="0" max="720" value="0" />
+            </div>
+          </div>
+        </div>
+
+        <div class="section no-print">
+          <button class="btn-primary" type="submit">Calcular liquidación completa</button>
+        </div>
+      </form>
     </section>
 
-    <div class="notice">
-      Fórmulas aplicadas: <strong>Cesantías = base × días / 360</strong>,
-      <strong>Intereses = cesantías × 0.12 × días / 360</strong>,
-      <strong>Prima = base × días / 360</strong>,
-      <strong>Vacaciones = salario × días / 720</strong>.
-      No incluye indemnizaciones, deducciones, horas extra ni casos especiales.
-    </div>
+    <aside class="card">
+      <h2>Resultado del caso práctico</h2>
+      <div id="estado" class="muted small">Diligencia el formulario y pulsa calcular.</div>
+
+      <section id="resultados" hidden>
+        <div class="result-item"><span>Días liquidados</span><strong id="rDias"></strong></div>
+        <div class="result-item"><span>Cesantías</span><strong id="rCesantias"></strong></div>
+        <div class="result-item"><span>Intereses de cesantías</span><strong id="rIntereses"></strong></div>
+        <div class="result-item"><span>Prima de servicios</span><strong id="rPrima"></strong></div>
+        <div class="result-item"><span>Vacaciones</span><strong id="rVacaciones"></strong></div>
+        <div class="result-item"><span>Indemnización</span><strong id="rIndemnizacion"></strong></div>
+        <div class="result-item"><span>Horas extra y recargos</span><strong id="rExtras"></strong></div>
+        <div class="result-item"><span>Dotación adeudada</span><strong id="rDotacion"></strong></div>
+        <div class="result-item"><span>Sanción moratoria</span><strong id="rSancion"></strong></div>
+        <div class="result-item total"><span>Total estimado</span><strong id="rTotal"></strong></div>
+      </section>
+
+      <div class="section">
+        <h2>Normativa y soporte jurídico en pantalla</h2>
+        <span class="pill">CST art. 249-253 (Cesantías e intereses)</span>
+        <span class="pill">CST art. 306 (Prima de servicios)</span>
+        <span class="pill">CST art. 186 y ss. (Vacaciones)</span>
+        <span class="pill">CST art. 64 (Indemnización)</span>
+        <span class="pill">Ley 52 de 1975 (Interés 12% anual)</span>
+        <span class="pill">Ley 789 de 2002 art. 28 y 30 (recargos)</span>
+        <p class="small muted">
+          Investigación jurídica asistida por IA (flujo compatible con Gemini): se integran normas, criterios de jurisprudencia laboral de la Corte Suprema sobre indemnización por despido sin justa causa y doctrina laboral común sobre liquidación final. Valida siempre el caso con abogado y actualización normativa anual.
+        </p>
+      </div>
+    </aside>
   </main>
 
   <script>
-    const form = document.getElementById('liquidacion-form');
-    const resultados = document.getElementById('resultados');
+    const byId = (id) => document.getElementById(id);
+    const form = byId('liquidacionForm');
+    const resultados = byId('resultados');
 
-    const formatCOP = (value) =>
-      new Intl.NumberFormat('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-        maximumFractionDigits: 0
-      }).format(value);
+    const formatCOP = (n) => new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      maximumFractionDigits: 0
+    }).format(Math.round(n || 0));
 
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
+    const diffDays = (startISO, endISO) => {
+      const start = new Date(startISO + 'T00:00:00');
+      const end = new Date(endISO + 'T00:00:00');
+      const ms = end - start;
+      if (Number.isNaN(ms) || ms < 0) return 0;
+      return Math.floor(ms / 86400000) + 1;
+    };
 
-      const salario = Number(document.getElementById('salario').value) || 0;
-      const auxilio = Number(document.getElementById('auxilio').value) || 0;
-      const dias = Number(document.getElementById('dias').value) || 0;
-      const incluyeAux = document.getElementById('incluyeAux').value === 'si';
+    const indemnizacion = ({ tipoContrato, causa, salario, smmlv, diasLaborados, diasPendientesFijo }) => {
+      if (causa !== 'sin_justa') return 0;
 
-      const basePrestaciones = salario + (incluyeAux ? auxilio : 0);
+      const salarioDia = salario / 30;
+      const anos = diasLaborados / 360;
+
+      if (tipoContrato === 'indefinido') {
+        const menor10 = salario < (10 * smmlv);
+        let diasIndemnizacion;
+
+        if (menor10) {
+          diasIndemnizacion = anos <= 1 ? 30 : 30 + Math.ceil((anos - 1) * 20);
+        } else {
+          diasIndemnizacion = anos <= 1 ? 20 : 20 + Math.ceil((anos - 1) * 15);
+        }
+
+        return salarioDia * diasIndemnizacion;
+      }
+
+      if (tipoContrato === 'fijo') {
+        return salarioDia * Math.max(0, diasPendientesFijo || 0);
+      }
+
+      return salarioDia * 15;
+    };
+
+    const now = new Date();
+    const inicioDefault = new Date(now.getFullYear(), 0, 1);
+    byId('fechaInicio').value = inicioDefault.toISOString().slice(0, 10);
+    byId('fechaFin').value = now.toISOString().slice(0, 10);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const salarioBase = Number(byId('salarioBase').value) || 0;
+      const tipoSalario = byId('tipoSalario').value;
+      const auxilio = Number(byId('auxilio').value) || 0;
+      const smmlv = Number(byId('smmlv').value) || 1300000;
+      const fechaInicio = byId('fechaInicio').value;
+      const fechaFin = byId('fechaFin').value;
+      const tipoContrato = byId('tipoContrato').value;
+      const causa = byId('causaTerminacion').value;
+      const includeAux = byId('includeAux').value === 'si';
+      const diasPendientesFijo = Number(byId('diasPendientesFijo').value) || 0;
+
+      const hextraDiurna = Number(byId('hextraDiurna').value) || 0;
+      const hextraNocturna = Number(byId('hextraNocturna').value) || 0;
+      const hrecargoNocturno = Number(byId('hrecargoNocturno').value) || 0;
+      const hrecargoFestivo = Number(byId('hrecargoFestivo').value) || 0;
+      const dotacionAdeudada = Number(byId('dotacionAdeudada').value) || 0;
+      const diasMora = Number(byId('diasMora').value) || 0;
+
+      const dias = diffDays(fechaInicio, fechaFin);
+      if (!dias) {
+        byId('estado').textContent = 'Verifica las fechas: la fecha final debe ser posterior o igual a la inicial.';
+        resultados.hidden = true;
+        return;
+      }
+
+      const factorIntegral = tipoSalario === 'integral' ? 0.7 : 1;
+      const salario = salarioBase * factorIntegral;
+      const basePrestaciones = salario + (includeAux ? auxilio : 0);
 
       const cesantias = (basePrestaciones * dias) / 360;
       const intereses = cesantias * 0.12 * (dias / 360);
       const prima = (basePrestaciones * dias) / 360;
       const vacaciones = (salario * dias) / 720;
-      const total = cesantias + intereses + prima + vacaciones;
 
-      document.getElementById('rCesantias').textContent = formatCOP(cesantias);
-      document.getElementById('rIntereses').textContent = formatCOP(intereses);
-      document.getElementById('rPrima').textContent = formatCOP(prima);
-      document.getElementById('rVacaciones').textContent = formatCOP(vacaciones);
-      document.getElementById('rTotal').textContent = formatCOP(total);
+      const valorHora = salario / 240;
+      const extras =
+        (valorHora * hextraDiurna * 1.25) +
+        (valorHora * hextraNocturna * 1.75) +
+        (valorHora * hrecargoNocturno * 0.35) +
+        (valorHora * hrecargoFestivo * 0.75);
 
+      const sancionMoratoria = (salario / 30) * Math.max(0, Math.min(720, diasMora));
+      const indemniza = indemnizacion({
+        tipoContrato,
+        causa,
+        salario,
+        smmlv,
+        diasLaborados: dias,
+        diasPendientesFijo
+      });
+
+      const total = cesantias + intereses + prima + vacaciones + indemniza + extras + dotacionAdeudada + sancionMoratoria;
+
+      byId('rDias').textContent = `${dias} días`;
+      byId('rCesantias').textContent = formatCOP(cesantias);
+      byId('rIntereses').textContent = formatCOP(intereses);
+      byId('rPrima').textContent = formatCOP(prima);
+      byId('rVacaciones').textContent = formatCOP(vacaciones);
+      byId('rIndemnizacion').textContent = formatCOP(indemniza);
+      byId('rExtras').textContent = formatCOP(extras);
+      byId('rDotacion').textContent = formatCOP(dotacionAdeudada);
+      byId('rSancion').textContent = formatCOP(sancionMoratoria);
+      byId('rTotal').textContent = formatCOP(total);
+
+      byId('estado').textContent = `Liquidación calculada para ${dias} días. Revisa soportes y particularidades del caso.`;
       resultados.hidden = false;
+    });
+
+    byId('darkModeBtn').addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+    });
+
+    byId('pdfBtn').addEventListener('click', () => {
+      window.print();
     });
   </script>
 </body>
